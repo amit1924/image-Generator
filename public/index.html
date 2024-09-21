@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input, select, button {
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 20px 0;
+    }
+    .download-link {
+      margin-top: 20px;
+    }
+
+    /* Media query for devices with width less than 500px */
+    @media (max-width: 500px) {
+      body {
+        padding: 10px;
+        max-width: 100%;
+      }
+      button {
+        padding: 12px;
+      }
+      input, select {
+        font-size: 16px;
+      }
+      img {
+        width: 100%;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Generate and Download Image</h1>
+  <form id="imageForm">
+    <label for="prompt">Enter Prompt</label>
+    <input type="text" id="prompt" name="prompt" placeholder="Describe your image..." required />
+    
+    <label for="width">Enter Width</label>
+    <input type="number" id="width" name="width" value="1024" required />
+
+    <label for="height">Enter Height</label>
+    <input type="number" id="height" name="height" value="1024" required />
+
+    <label for="seed">Enter Seed</label>
+    <input type="number" id="seed" name="seed" value="42" required />
+
+    <label for="model">Select Model</label>
+    <select id="model" name="model">
+      <option value="flux">Flux</option>
+      <!-- Add other models if needed -->
+    </select>
+
+    <button type="submit">Generate Image</button>
+  </form>
+  
+  <img src="" alt="" id="img" />
+
+  <div class="download-link">
+    <a id="downloadLink" href="#" style="display: none;">Download Image</a>
+  </div>
+
+  <script>
+    const image = document.getElementById("img");
+    const button = document.querySelector("button");
+    const form = document.getElementById('imageForm');
+    const downloadLink = document.getElementById('downloadLink');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      button.textContent = "Generating image...";
+      button.style.backgroundColor = "red";
+      image.alt = "no-image";
+      
+      const formData = new FormData(form);
+      const data = {
+        prompt: formData.get('prompt'),
+        width: formData.get('width'),
+        height: formData.get('height'),
+        seed: formData.get('seed'),
+        model: formData.get('model')
+      };
+
+      // Send POST request to the server to generate the image
+      const response = await fetch('/generate-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      console.log(`result: ${result.imageUrl}`);
+      button.textContent = "Image downloaded already";
+      button.style.backgroundColor = "blue";
+      image.src = result.imageUrl;
+
+      
+    });
+  </script>
+</body>
+</html>
