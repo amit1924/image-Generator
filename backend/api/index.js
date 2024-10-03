@@ -124,7 +124,14 @@ import Image from "../model/image.js";
 const app = express();
 const PORT = 3000;
 
-app.use(cors());
+// app.use(cors());
+app.use(
+  cors({
+    origin: "https://image-generator-frontend-plum.vercel.app",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true, // Enable sending cookies and headers with requests if necessary
+  })
+);
 // app.use(express.static("public"));
 app.use(express.json());
 
