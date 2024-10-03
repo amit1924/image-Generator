@@ -65,12 +65,12 @@ const Carousel = () => {
             />
             {downloadImage && (
               <a
-                href={image}
-                download="generated-image.jpg"
-                className="mt-4 animate-pulse bg-red-800 rounded-lg px-2 py-1 text-white"
-              >
-                Download Image
-              </a>
+  href={image.image}  // Use the correct image URL
+  download={`generated-image-${index + 1}.jpg`}  // Unique filename for each image
+  className="mt-4 animate-pulse bg-red-800 rounded-lg px-2 py-1 text-white"
+>
+  Download Image
+</a>
             )}
             <button
               onClick={() => handleDelete(image._id)}
