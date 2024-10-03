@@ -114,9 +114,9 @@
 //   console.log(`Server is running on http://localhost:${PORT}`);
 // });
 import express from "express";
-import fetch from "node-fetch";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
+// import fetch from "node-fetch";
+// import { fileURLToPath } from "url";
+// import { dirname } from "path";
 import cors from "cors";
 import dbConnect from "../db/dbConnect.js";
 import Image from "../model/image.js";
@@ -125,11 +125,11 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors());
-app.use(express.static("public"));
+// app.use(express.static("public"));
 app.use(express.json());
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
 
 app.get("/", (req, res) => {
   res.send("Server is running...");
