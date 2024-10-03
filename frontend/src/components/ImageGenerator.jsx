@@ -13,13 +13,16 @@ const ImageGenerator = () => {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("http://localhost:3000/generate-image", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt, width, height, seed, model }),
-      });
+      const res = await fetch(
+        "https://image-generator-backend-taupe.vercel.app/generate-image",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt, width, height, seed, model }),
+        }
+      );
       const data = await res.json();
       if (res.status === 200) {
         setImage(data.imageUrl);

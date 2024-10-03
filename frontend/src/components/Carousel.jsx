@@ -8,7 +8,9 @@ const Carousel = () => {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const res = await fetch("http://localhost:3000/get-images");
+        const res = await fetch(
+          "https://image-generator-backend-taupe.vercel.app/get-images"
+        );
         const data = await res.json();
         console.log(data.images);
         setLoading(false);
@@ -31,9 +33,12 @@ const Carousel = () => {
 
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3000/delete-image/${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `https://image-generator-backend-taupe.vercel.app/delete-image/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
       const data = await res.json();
       if (res.status === 200) {
         alert(data.message);
