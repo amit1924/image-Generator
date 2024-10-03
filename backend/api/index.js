@@ -113,10 +113,112 @@
 // app.listen(PORT, () => {
 //   console.log(`Server is running on http://localhost:${PORT}`);
 // });
+// import express from "express";
+// // import fetch from "node-fetch";
+// // import { fileURLToPath } from "url";
+// // import { dirname } from "path";
+// import cors from "cors";
+// import dbConnect from "../db/dbConnect.js";
+// import Image from "../model/image.js";
+
+// const app = express();
+// const PORT = 3000;
+
+// // app.use(cors());
+// app.use(
+//   cors({
+//     origin: "https://image-generator-frontend-plum.vercel.app",
+//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//     credentials: true, // Enable sending cookies and headers with requests if necessary
+//   })
+// );
+// // app.use(express.static("public"));
+// app.use(express.json());
+
+// // const __filename = fileURLToPath(import.meta.url);
+// // const __dirname = dirname(__filename);
+
+// app.get("/", (req, res) => {
+//   res.send("Server is running...");
+// });
+
+// // Route to handle image generation based on user input
+// app.post("/generate-image", async (req, res) => {
+//   const { prompt, width, height, seed, model } = req.body;
+
+//   // Validate input data
+//   if (!prompt || !width || !height || !seed || !model) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+//   try {
+//     const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(
+//       prompt
+//     )}?width=${width}&height=${height}&seed=${seed}&model=${model}`;
+
+//     if (!imageUrl) {
+//       return res.status(404).json({ message: "Image not found" });
+//     }
+
+//     // Save the image URL to MongoDB
+//     const newImage = new Image({
+//       image: imageUrl,
+//     });
+//     await newImage.save();
+
+//     // Send response after saving the image to MongoDB
+//     res.status(200).json({
+//       imageUrl,
+//       message: "Image generated and saved successfully",
+//     });
+//   } catch (error) {
+//     console.error("Error generating or saving image:", error.message);
+//     res
+//       .status(500)
+//       .json({ error: "Image generation failed: " + error.message });
+//   }
+// });
+
+// app.get("/get-images", async (req, res) => {
+//   try {
+//     const images = await Image.find();
+//     if (images) {
+//       res.status(200).json({ images });
+//     } else {
+//       res.status(400) / json({ message: "No any image found" });
+//     }
+//   } catch (error) {
+//     res
+//       .status(500)
+//       .json({ error: "Image generation failed: " + error.message });
+//   }
+// });
+
+// // Delete images
+// app.delete("/delete-image/:id", async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     console.log(id);
+//     const deleteImage = await Image.findByIdAndDelete(id);
+//     console.log(deleteImage._id);
+//     if (deleteImage) {
+//       res.status(200).json({ message: "Image deleted successfully" });
+//     } else {
+//       res.status(400).json({ message: "image not found" });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+
+// // Start the server
+// app.listen(PORT, () => {
+//   dbConnect();
+//   console.log(`Server is running on http://localhost:${PORT}`);
+// });
+
+//////////////////////////////////////////////////
 import express from "express";
-// import fetch from "node-fetch";
-// import { fileURLToPath } from "url";
-// import { dirname } from "path";
 import cors from "cors";
 import dbConnect from "../db/dbConnect.js";
 import Image from "../model/image.js";
@@ -124,20 +226,21 @@ import Image from "../model/image.js";
 const app = express();
 const PORT = 3000;
 
-// app.use(cors());
+// Middleware to handle CORS for all routes
 app.use(
   cors({
-    origin: "https://image-generator-frontend-plum.vercel.app",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    origin: "https://image-generator-frontend-plum.vercel.app", // Replace with your frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // Enable sending cookies and headers with requests if necessary
   })
 );
-// app.use(express.static("public"));
+
 app.use(express.json());
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
+// Connect to MongoDB when the server starts
+dbConnect();
 
+// Root route
 app.get("/", (req, res) => {
   res.send("Server is running...");
 });
@@ -179,40 +282,41 @@ app.post("/generate-image", async (req, res) => {
   }
 });
 
+// Route to retrieve all images from MongoDB
 app.get("/get-images", async (req, res) => {
   try {
     const images = await Image.find();
-    if (images) {
+    if (images.length > 0) {
       res.status(200).json({ images });
     } else {
-      res.status(400) / json({ message: "No any image found" });
+      res.status(404).json({ message: "No images found" });
     }
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Image generation failed: " + error.message });
+    console.error("Error fetching images:", error.message);
+    res.status(500).json({ error: "Fetching images failed: " + error.message });
   }
 });
 
-// Delete images
+// Route to delete an image by ID
 app.delete("/delete-image/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id);
     const deleteImage = await Image.findByIdAndDelete(id);
-    console.log(deleteImage._id);
+
     if (deleteImage) {
       res.status(200).json({ message: "Image deleted successfully" });
     } else {
-      res.status(400).json({ message: "image not found" });
+      res.status(404).json({ message: "Image not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Error deleting image:", error.message);
+    res
+      .status(500)
+      .json({ message: "Internal server error: " + error.message });
   }
 });
 
 // Start the server
 app.listen(PORT, () => {
-  dbConnect();
   console.log(`Server is running on http://localhost:${PORT}`);
 });
